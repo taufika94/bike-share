@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 
+
+
 # Set page configuration
 st.set_page_config(page_title="Dashboard Analisis Penyewaan Sepeda", layout="wide")
 
@@ -37,8 +39,100 @@ if uploaded_file_hour is not None and uploaded_file_day is not None:
     hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
 
     # Display DataFrame
-    st.write("Tabel Hour Data", hour_df.head())
-    st.write("Tabel Day Data", day_df.head())
+    st.write("Tabel dan visualisasi Hour Data", hour_df.head())
+        
+    # Convert date column (dteday) to datetime format
+    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
+
+        
+    # 1. User Distribution by Hour
+    st.subheader("1. User Distribution by Hour")
+    fig1, ax1 = plt.subplots(figsize=(12, 6))
+    sns.lineplot(x='hr', y='cnt', data=hour_df, ax=ax1, label='Total Users')
+    sns.lineplot(x='hr', y='casual', data=hour_df, ax=ax1, label='Casual Users', linestyle='--')
+    sns.lineplot(x='hr', y='registered', data=hour_df, ax=ax1, label='Registered Users', linestyle='--')
+    ax1.set_title('Distribution of Users by Hour')
+    ax1.set_xlabel('Hour of the Day')
+    ax1.set_ylabel('Number of Users')
+    ax1.legend()
+    st.pyplot(fig1)
+
+    # 2. User Distribution by Weekday
+    st.subheader("2. User Distribution by Weekday")
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    sns.boxplot(x='weekday', y='cnt', data=hour_df, ax=ax2)
+    ax2.set_title('Distribution of Total Users by Weekday')
+    ax2.set_xlabel('Weekday (0 = Sunday, 6 = Saturday)')
+    ax2.set_ylabel('Total Users')
+    st.pyplot(fig2)
+
+    # 3. Total Users by Weather Situation
+    st.subheader("3. Total Users by Weather Situation")
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
+    sns.barplot(x='weathersit', y='cnt', data=hour_df, ax=ax3)
+    ax3.set_title('Total Users by Weather Situation')
+    ax3.set_xlabel('Weather Situation (1 = Clear, 2 = Mist, 3 = Light Rain/Snow)')
+    ax3.set_ylabel('Total Users')
+    st.pyplot(fig3)
+
+    # 4. Temperature vs Total Users
+    st.subheader("4. Temperature vs Total Users")
+    fig4, ax4 = plt.subplots(figsize=(12, 6))
+    sns.scatterplot(x='temp', y='cnt', data=hour_df, ax=ax4)
+    ax4.set_title('Temperature vs Total Users')
+    ax4.set_xlabel('Temperature (normalized)')
+    ax4.set_ylabel('Total Users')
+    st.pyplot(fig4)
+
+    # 5. Correlation Matrix
+    st.subheader("5. Correlation Matrix")
+    fig5, ax5 = plt.subplots(figsize=(12, 8))
+    sns.heatmap(hour_df.corr(), annot=True, cmap='coolwarm', fmt='.2f', ax=ax5)
+    ax5.set_title('Correlation Matrix')
+    st.pyplot(fig5)
+
+
+
+    st.write("Tabel dan visualisasi Day Data", day_df.head())
+
+    # Histogram of Total Bike Rentals
+    st.subheader("Distribution of Total Bike Rentals (cnt)")
+    plt.figure(figsize=(10, 6))
+    sns.histplot(day_df['cnt'], bins=30, kde=True, color='blue')
+    plt.title('Distribution of Total Bike Rentals (cnt)')
+    plt.xlabel('Total Bike Rentals (cnt)')
+    plt.ylabel('Frequency')
+    st.pyplot(plt)  # Tampilkan plot
+
+    # Boxplot of Bike Rentals by Season
+    st.subheader("Boxplot of Bike Rentals by Season")
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x='season', y='cnt', data=day_df, palette='Set2')
+    plt.title('Boxplot of Bike Rentals by Season')
+    plt.xlabel('Season')
+    plt.ylabel('Total Bike Rentals (cnt)')
+    plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
+    st.pyplot(plt)  # Tampilkan plot
+
+    # Scatter plot of Bike Rentals vs Temperature
+    st.subheader("Bike Rentals (cnt) vs Temperature")
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x='temp', y='cnt', data=day_df, color='orange')
+    plt.title('Bike Rentals (cnt) vs Temperature')
+    plt.xlabel('Temperature (normalized)')
+    plt.ylabel('Total Bike Rentals (cnt)')
+    st.pyplot(plt)  # Tampilkan plot
+
+    # Time series plot of Bike Rentals Over Time
+    st.subheader("Total Bike Rentals Over Time")
+    plt.figure(figsize=(12, 6))
+    plt.plot(day_df['dteday'], day_df['cnt'], label='Total Bike Rentals', color='green')
+    plt.title('Total Bike Rentals Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Total Bike Rentals (cnt)')
+    plt.xticks(rotation=45)
+    plt.legend()
+    st.pyplot(plt)  # Tampilkan plot
 
     # Exploratory Data Analysis
     st.subheader("Analisis Eksplorasi Data")
